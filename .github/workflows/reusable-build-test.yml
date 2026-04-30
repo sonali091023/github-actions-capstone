@@ -1,0 +1,55 @@
+name: Reusable Build and Test
+
+on:
+  workflow_call:                                                 #makes this workflow reusable by other workflows
+    inputs:
+      node_version:
+        required: true
+        type: string
+      run_tests:
+        required: false
+        type: boolean
+        default: true
+    outputs:
+      test_result:
+        description: "Test result status"
+        value: ${{ jobs.build-test.outputs.test_result }}
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+
+    outputs:
+      test_result: ${{ steps.set-result.outputs.result }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ inputs.node_version }}
+
+      - name: Install dependencies
+        run: |
+          cd app
+          npm install
+
+      - name: Run tests
+        id: run-tests
+        if: ${{ inputs.run_tests }}
+        run: |
+          cd app
+          node index.js &                                          #Here used & because: Runs server in background so pipeline continues
+          sleep 5                                                  #Gives server time to start
+          curl http://localhost:3000/health                        #If curl fails → step fails → workflow fails automatically
+
+      - name: Set test result (passed)
+        if: success()
+        id: set-result
+        run: echo "result=passed" >> $GITHUB_OUTPUT
+
+      - name: Set test result (failed)
+        if: failure()
+        run: echo "result=failed" >> $GITHUB_OUTPUT

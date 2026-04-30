@@ -1,0 +1,23 @@
+name: Main CI Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-test:
+    uses: ./.github/workflows/reusable-build-test.yml
+    with:
+      node_version: "18"
+      run_tests: true
+
+  docker:
+    needs: build-test
+    uses: ./.github/workflows/reusable-docker.yml
+    with:
+      image_name: sonali0910/my-app
+      tag: latest
+    secrets:
+      docker_username: ${{ secrets.DOCKER_USERNAME }}
+      docker_token: ${{ secrets.DOCKER_TOKEN }}
