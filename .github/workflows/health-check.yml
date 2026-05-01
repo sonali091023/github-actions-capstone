@@ -1,0 +1,47 @@
+name: Health Check
+
+on:
+  schedule:
+    - cron: '0 */12 * * *'
+  workflow_dispatch:
+
+jobs:
+  health-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Pull latest Docker image
+        run: docker pull sonali0910/my-app:latest
+
+      - name: Run container
+        run: |
+          docker run -d --name health-container -p 3000:3000 sonali0910/my-app:latest
+
+      - name: Wait and check health
+        id: health
+        run: |
+          sleep 5
+          response=$(curl -s http://localhost:3000/health)
+
+          if [[ "$response" == *"OK"* ]]; then
+            echo "status=PASSED" >> $GITHUB_OUTPUT
+            echo "Health check PASSED"
+          else
+            echo "status=FAILED" >> $GITHUB_OUTPUT
+            echo "Health check FAILED"
+            exit 1
+          fi
+
+      - name: Stop and remove container
+        if: always()
+        run: |
+          docker stop health-container
+          docker rm health-container
+
+      - name: Add summary
+        if: always()
+        run: |
+          echo "## Health Check Report" >> $GITHUB_STEP_SUMMARY
+          echo "- Image: sonali0910/my-app:latest" >> $GITHUB_STEP_SUMMARY
+          echo "- Status: ${{ steps.health.outputs.status }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Time: $(date)" >> $GITHUB_STEP_SUMMARY
