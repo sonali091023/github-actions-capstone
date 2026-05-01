@@ -1,0 +1,23 @@
+{
+  "name": "github-actions-capstone",
+  "version": "1.0.0",
+  "description": "This is a simple Node.js Express application used to demonstrate GitHub Actions CI/CD workflows.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sonali091023/github-actions-capstone.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/sonali091023/github-actions-capstone/issues"
+  },
+  "homepage": "https://github.com/sonali091023/github-actions-capstone#readme",
+  "dependencies": {
+    "express": "^5.2.1"
+  }
+}
