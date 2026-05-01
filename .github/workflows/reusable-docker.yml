@@ -51,8 +51,8 @@ jobs:
           push: true
           no-cache: true
           tags: |
-            ${{ vars.DOCKER_USERNAME }}/${{ inputs.image_name }}:${{ inputs.tag }}
-            ${{ vars.DOCKER_USERNAME }}/${{ inputs.image_name }}:latest
+            ${{ secrets.DOCKER_USERNAME }}/${{ inputs.image_name }}:${{ inputs.tag }}
+            ${{ secrets.DOCKER_USERNAME }}/${{ inputs.image_name }}:latest
 
 
       - name: Set image_url output
