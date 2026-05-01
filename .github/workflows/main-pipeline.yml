@@ -73,6 +73,10 @@ jobs:
         with:
           name: trivy-report
           path: trivy-results.sarif
+      
+      - name: Show SARIF content
+        run: cat trivy-results.sarif
+          
 
   deploy:
     name: Deploy to Production
