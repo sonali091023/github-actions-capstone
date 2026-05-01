@@ -42,8 +42,8 @@ jobs:
       image_name: node-app
       tag: sha-${{ needs.generate-sha.outputs.short_sha }}
     secrets:
-      docker_username: ${{ vars.DOCKER_USERNAME }}
-      docker_token: ${{ secrets.DOCKERHUB_TOKEN }}
+      docker_username: ${{ secrets.DOCKER_USERNAME }}
+      docker_token: ${{ secrets.DOCKER_TOKEN }}
 
   trivy-scan:
     name: Trivy Vulnerability Scan
@@ -54,7 +54,7 @@ jobs:
       - name: Run Trivy vulnerability scan
         uses: aquasecurity/trivy-action@0.35.0
         with:
-          image-ref: ${{ vars.DOCKER_USERNAME }}/node-app:sha-${{ needs.generate-sha.outputs.short_sha }}
+          image-ref: ${{ secrets.DOCKER_USERNAME }}/node-app:sha-${{ needs.generate-sha.outputs.short_sha }}
           format: table
           severity: 'CRITICAL,HIGH'
           ignore-unfixed: true
