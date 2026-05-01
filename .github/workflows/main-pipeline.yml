@@ -28,7 +28,7 @@ jobs:
 
     steps:
       - name: Scan Docker Image for Vulnerabilities
-        uses: aquasecurity/trivy-action@v0
+        uses: aquasecurity/trivy-action@0.35.0
         with:
           image-ref: ${{ needs.docker.outputs.image_url }}
           format: 'table'
