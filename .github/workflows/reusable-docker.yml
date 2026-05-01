@@ -1,6 +1,6 @@
 name: Reusable Docker Build & Push
 
-on:                                                             #Add trigger + inputs + secrets
+on:
   workflow_call:
     inputs:
       image_name:
@@ -16,7 +16,6 @@ on:                                                             #Add trigger + i
         required: true
     outputs:
       image_url:
-        description: "Full Docker image path"
         value: ${{ jobs.docker.outputs.image_url }}
 
 jobs:
