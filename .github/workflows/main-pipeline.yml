@@ -21,12 +21,16 @@ jobs:
     secrets:
       docker_username: ${{ secrets.DOCKER_USERNAME }}
       docker_token: ${{ secrets.DOCKER_TOKEN }}
-
+      
   security-scan:
     needs: docker
     runs-on: ubuntu-latest
 
     steps:
+
+      - name: Debug image URL
+        run: echo "Image URL = ${{ needs.docker.outputs.image_url }}"
+      
       - name: Scan Docker Image for Vulnerabilities
         uses: aquasecurity/trivy-action@0.35.0
         with:
