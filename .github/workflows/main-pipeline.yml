@@ -63,16 +63,16 @@ jobs:
           ignore-unfixed: true
           exit-code: 0
 
-      - name: Upload SARIF report
-        uses: github/codeql-action/upload-sarif@v3
-        with:
-          sarif_file: trivy-results.sarif
+      #- name: Upload SARIF report
+        #uses: github/codeql-action/upload-sarif@v3
+        #with:
+          #sarif_file: trivy-results.sarif
 
-      - name: Upload Trivy report
-        uses: actions/upload-artifact@v4
-        with:
-          name: trivy-report
-          path: trivy-results.sarif
+      #- name: Upload Trivy report
+        #uses: actions/upload-artifact@v4
+        #with:
+          #name: trivy-report
+          #path: trivy-results.sarif
       
       #- name: Show SARIF content
         #run: cat trivy-results.sarif
