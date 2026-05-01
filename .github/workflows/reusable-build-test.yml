@@ -1,55 +1,53 @@
-name: Reusable Build and Test
+name: Reusable — Build & Test
 
 on:
-  workflow_call:                                                 #makes this workflow reusable by other workflows
+  workflow_call:
     inputs:
       node_version:
-        required: true
+        description: 'Node.js version to use'
         type: string
+        default: '24'
       run_tests:
-        required: false
+        description: 'Whether to run tests'
         type: boolean
         default: true
     outputs:
       test_result:
-        description: "Test result status"
+        description: 'Result of the test run: passed or failed'
         value: ${{ jobs.build-test.outputs.test_result }}
 
 jobs:
   build-test:
+    name: Build & Test (Node ${{ inputs.node_version }})
     runs-on: ubuntu-latest
 
     outputs:
-      test_result: ${{ steps.set-result.outputs.result }}
+      test_result: ${{ steps.set-result.outputs.test_result }}
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
+      - name: Set up Node.js ${{ inputs.node_version }}
+        uses: actions/setup-node@v5
         with:
           node-version: ${{ inputs.node_version }}
+          cache: 'npm'
 
       - name: Install dependencies
-        run: |
-          cd app
-          npm install
+        run: npm ci
 
       - name: Run tests
+        if: ${{ inputs.run_tests == true }}
         id: run-tests
-        if: ${{ inputs.run_tests }}
-        run: |
-          cd app
-          node index.js &                                          #Here used & because: Runs server in background so pipeline continues
-          sleep 5                                                  #Gives server time to start
-          curl http://localhost:3000/health                        #If curl fails → step fails → workflow fails automatically
+        run: npm test
 
-      - name: Set test result (passed)
-        if: success()
+      - name: Set output
         id: set-result
-        run: echo "result=passed" >> $GITHUB_OUTPUT
-
-      - name: Set test result (failed)
-        if: failure()
-        run: echo "result=failed" >> $GITHUB_OUTPUT
+        if: always()
+        run: |
+          if [[ "${{ steps.run-tests.outcome }}" == "success" || "${{ inputs.run_tests }}" == "false" ]]; then
+            echo "test_result=passed" >> "$GITHUB_OUTPUT"
+          else
+            echo "test_result=failed" >> "$GITHUB_OUTPUT"
+          fi
