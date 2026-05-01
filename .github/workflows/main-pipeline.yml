@@ -68,6 +68,12 @@ jobs:
         with:
           sarif_file: trivy-results.sarif
 
+      - name: Upload Trivy report
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-report
+          path: trivy-results.sarif
+
   deploy:
     name: Deploy to Production
     runs-on: ubuntu-latest
