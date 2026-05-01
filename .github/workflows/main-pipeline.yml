@@ -28,8 +28,7 @@ jobs:
 
     steps:
       - name: Run Trivy vulnerability scanner                     #pipeline stops here, deploy never runs
-        uses: |
-          uses: aquasecurity/trivy-action@master
+        uses: uses: aquasecurity/trivy-action@v0.20.0
         with:
           image-ref: ${{ needs.docker.outputs.image_url }}
           format: 'table'
