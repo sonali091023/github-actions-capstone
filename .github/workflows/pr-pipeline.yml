@@ -10,7 +10,7 @@ on:
 
 permissions:
   contents: read
-  pull-requests: write
+  pull-requests: write              #needed for PR-related actions
 
 jobs:
   dependency-review:
