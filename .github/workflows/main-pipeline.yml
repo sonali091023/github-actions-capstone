@@ -7,7 +7,6 @@ on:
 
 permissions:
   contents: read
-  security-events: write   # ✅ for SARIF upload (optional but recommended)
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
@@ -21,6 +20,7 @@ jobs:
       node_version: '20'
       run_tests: true
 
+
   generate-sha:
     name: Generate Short SHA
     runs-on: ubuntu-latest
@@ -33,16 +33,17 @@ jobs:
         run: |
           echo "short_sha=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
 
+
   docker-build:
     name: Docker Build & Push
     needs: [build-test, generate-sha]
     uses: ./.github/workflows/reusable-docker.yml
     with:
-      image_name: ${{ secrets.DOCKER_USERNAME }}/node-app   # ✅ FIXED (no vars)
+      image_name: node-app
       tag: sha-${{ needs.generate-sha.outputs.short_sha }}
     secrets:
       docker_username: ${{ secrets.DOCKER_USERNAME }}
-      docker_token: ${{ secrets.DOCKER_TOKEN }}
+      docker_token: ${{ secrets.DOCKERHUB_TOKEN }}
 
   trivy-scan:
     name: Trivy Vulnerability Scan
@@ -54,22 +55,11 @@ jobs:
         uses: aquasecurity/trivy-action@0.35.0
         with:
           image-ref: ${{ secrets.DOCKER_USERNAME }}/node-app:sha-${{ needs.generate-sha.outputs.short_sha }}
-          format: sarif                     # ✅ better format
-          output: trivy-report.sarif        # ✅ save report
+          format: table
           severity: 'CRITICAL,HIGH'
           ignore-unfixed: true
-          exit-code: 0                      # ✅ don’t fail pipeline
+          exit-code: 1
 
-      - name: Upload Trivy Report Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: trivy-report
-          path: trivy-report.sarif
-
-      - name: Upload SARIF to GitHub Security
-        uses: github/codeql-action/upload-sarif@v3
-        with:
-          sarif_file: trivy-report.sarif
 
   deploy:
     name: Deploy to Production
